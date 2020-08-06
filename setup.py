@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="stopsignalmetrics",
-    version="0.0.0.1",
+    version="0.0.0.5",
     author="Henry Jones",
     author_email="henrymj@stanford.edu",
     description="package for stop signal task metrics",
@@ -19,5 +19,5 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.4',
-    install_requires=['numpy', 'pandas', 'sklearn']
+    install_requires=['numpy', 'pandas', 'scikit-learn']
 )

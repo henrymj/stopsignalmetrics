@@ -1,11 +1,11 @@
 import json
 import pandas as pd
-from base import MultiLevelComputer
-from ssrtmodel import SSRTmodel
-from sequence import PostStopSlow, Violations
+from .base import MultiLevelComputer
+from .ssrtmodel import SSRTmodel
+from .sequence import PostStopSlow, Violations
 
 
-class Summary(MultiLevelComputer):
+class StopSummary(MultiLevelComputer):
     def __init__(self, ssrt_model='replacement',
                  pss_correct_go_only=True, pss_filter_columns=True,
                  violations_mean_thresh=200, violations_ssd_quantity_thresh=5,

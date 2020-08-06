@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.exceptions import NotFittedError
-from base import MultiLevelComputer
+from .base import MultiLevelComputer
 
 
 class SSRTmodel(MultiLevelComputer):
