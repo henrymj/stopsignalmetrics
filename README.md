@@ -5,7 +5,7 @@
 This is a package to streamline common computations on behavioral data from experiments using Stop Signal tasks. It is made up of multiple classes which focus on different types of metrics. All classes follow the scikit-learn `fit`, `transform` schema.
 
 __0. `StopData` - Preprocessing and Standardization.__
-This class will be initialized witha nested dictionary, mapping columns (e.g. the SSD and RT columns) and key_codes (e.g. labels for stop and go trials in the condition column) from the current data onto a standard. See stopsignalmetrics/standards.json or the examples to get a sense of this mapping. It will also compute choice accuracy if a choice accuracy column is not found, or `compute_acc_col=True` is passed in at intialization.
+This class will be initialized with a nested dictionary, mapping columns (e.g. the SSD and RT columns) and key_codes (e.g. labels for stop and go trials in the condition column) from the current data onto a standard. See stopsignalmetrics/standards.json or the examples to get a sense of this mapping. It will also compute choice accuracy if a choice accuracy column is not found, or `compute_acc_col=True` is passed in at intialization.
 
 __1. `SSRTmodel` - Stop Signal Reaction Time (SSRT) Computation.__
 The `SSRTmodel` class contains 4 methods of Stop Signal Reaction Time (SSRT) computation, following the recommendations of [Verbruggen et al. (2019)](10.7554/eLife.46323):
