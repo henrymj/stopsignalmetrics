@@ -77,10 +77,9 @@ class SSRTmodel(MultiLevelComputer):
         goRTs = self._get_all_goRTs(sort=True)
         P_respond = self._metrics['p_respond']
         corrected_P_respond = P_respond/(1-self._metrics['omission_rate'])
-        goRTs_w_replacements = np.concatenate((goRTs,
-                                               [self._metrics['max_RT']]
-                                               * self._metrics['omission_count']
-                                               ))
+        goRTs_w_replacements = np.concatenate((
+            goRTs,
+            [self._metrics['max_RT']] * self._metrics['omission_count']))
 
         for key, nrt in [('mean', np.mean(goRTs)),
                          ('integration', self._get_nth_RT(P_respond, goRTs)),

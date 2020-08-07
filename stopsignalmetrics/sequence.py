@@ -36,7 +36,7 @@ class Sequence(Computer):
         sequence_df['trial_index'] = indices
         for shift, pfix in [(-1, 'pre'), (0, 'curr'), (1, 'post')]:
             for col in self._raw_data.columns:
-                sequence_df[f'{pfix}_{col}'] = self._raw_data.loc[
+                sequence_df['{}_{}'.format(pfix, col)] = self._raw_data.loc[
                     indices+shift, col].values
 
         # block match
@@ -70,7 +70,8 @@ class PostStopSlow(Computer):
         self._raw_data = data_df.copy()
         sequence_df = Sequence().fit_transform(
             self._raw_data,
-            f"{self._cols['condition']}=='{self._codes['stop']}'"
+            "{}=='{}'".format(self._cols['condition'],
+                              self._codes['stop'])
             )
 
         if self._filter_columns:
@@ -175,7 +176,8 @@ class Violations(MultiLevelComputer):
                                         'mean_violation',
                                         'mean_stopFailureRT',
                                         'mean_precedingGoRT'])
-        va_df = info_df.query(f'n_go_stopfail_pairs >= {self._n_pair_thresh}')
+        va_df = info_df.query('n_go_stopfail_pairs >= {}'.format(
+            self._n_pair_thresh))
         self._transformed_data = va_df.sort_values(by=self._cols["SSD"])
 
     def _fit_group(self, data_df):

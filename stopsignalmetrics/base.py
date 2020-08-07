@@ -38,19 +38,19 @@ class Computer:
 
         for key in [key for key in self._cols.keys() if key != 'ID']:
             assert self._cols[key] in data_df.columns, \
-                f'missing {self._cols[key]} from data df columns'
+                'missing {} from data df columns'.format(self._cols[key])
 
         condition_codes = data_df[self._cols['condition']].unique()
         for cond in ['go', 'stop']:
-            assert self._codes[cond] in condition_codes, \
-                (f'missing {self._codes[cond]}'
-                 f' from column: {self._cols["condition"]}.')
+            assert self._codes[cond] in condition_codes,\
+                'missing {} from column: {}.'.format(
+                self._cols[cond], self._cols["condition"])
 
         acc_codes = data_df[self._cols['choice_accuracy']].unique()
         for acc in ['correct', 'incorrect']:
-            assert self._codes[acc] in acc_codes, \
-                (f'missing {self._codes[acc]}'
-                 f' from column: {self._cols["choice_accuracy"]}.')
+            assert self._codes[acc] in acc_codes,\
+                'missing {} from column: {}.'.format(
+                self._cols[acc], self._cols["choice_accuracy"])
         return True
 
 

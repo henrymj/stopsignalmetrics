@@ -49,12 +49,13 @@ class StopData(Computer):
         for key in [key for key in self._map_cols.keys()
                     if key not in ['block', 'choice_accuracy', 'ID']]:
             assert self._map_cols[key] in self._raw_data.columns,\
-                f'missing {self._map_cols[key]} from raw data df columns'
+                 'missing {} from raw data df columns'.format(
+                    self._map_cols[key])
 
         condition_codes = self._raw_data[self._map_cols['condition']].unique()
         for cond in ['go', 'stop']:
             assert self._map_codes[cond] in condition_codes,\
-                (f'missing {self._map_codes[cond]} from column: ',
+                ('missing {} from column: '.format(self._map_codes[cond]),
                  self._map_cols["condition"])
 
         if self._map_cols['choice_accuracy'] in self._raw_data.columns:
@@ -62,7 +63,7 @@ class StopData(Computer):
                 self._map_cols['choice_accuracy']].unique()
             for acc in ['correct', 'incorrect']:
                 assert self._map_codes[acc] in acc_codes,\
-                    (f'missing {self._map_codes[acc]} from column: ',
+                    ('missing {} from column: '.format(self._map_codes[acc]),
                      self._map_cols["choice_accuracy"])
         return True
 
@@ -77,16 +78,19 @@ class StopData(Computer):
                 data_df[self._map_cols['goRT']],
                 np.nan)
             data_df[self._standards['columns']['stopRT']] = np.where(
-                data_df[self._map_cols['condition']] == self._map_codes['stop'],
+                data_df[self._map_cols['condition']] ==
+                self._map_codes['stop'],
                 data_df[self._map_cols['stopRT']],
                 np.nan)
             del data_df[self._map_cols['goRT']]
         else:
             data_df.loc[
-                data_df[self._map_cols['condition']] != self._map_codes['go'],
+                data_df[self._map_cols['condition']] !=
+                self._map_codes['go'],
                 self._map_cols['goRT']] = np.nan
             data_df.loc[
-                data_df[self._map_cols['condition']] != self._map_codes['stop'],
+                data_df[self._map_cols['condition']] !=
+                self._map_codes['stop'],
                 self._map_cols['stopRT']] = np.nan
 
         # drop SSDs of non-stop Trials
