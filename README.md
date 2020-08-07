@@ -11,7 +11,7 @@ __1. `SSRTmodel` - Stop Signal Reaction Time (SSRT) Computation.__
 The `SSRTmodel` class contains 4 methods of Stop Signal Reaction Time (SSRT) computation:
 
 _1. Integration with Replacement ("replacement")_  
-This method replaces go omissions with the max reaction time before getting the nth_RT. This is the recommended method from [Verbruggen et al. (2019)](10.7554/eLife.46323). 
+This method replaces go omissions with the max reaction time before getting the nth_RT. This is the recommended method from [Verbruggen et al. (2019)](10.7554/eLife.46323). The other 3 methods are included for completeness and comparison, but in general we agree with Verbruggen et al. 2019 that the Integration with Replacement method is preferred. 
 
 _2. Integration with Omission Rate Adjustment ("omission")_  
 This method uses the omission rate on go trials to adjust the P(respond | signal) before getting the nth_index.
@@ -20,7 +20,7 @@ _3. Integration ("integration")_
 A vanilla version of the above two methods which makes no adjustment based on omissions.
 
 _4. Mean ("mean")_  
-Based on the assumption that a 1-up-1-down tracking method was used and P(repsond | signal) = 0.5, though this is not used in the actual computation. Formula: SSRT = mean_go_RT - mean_SSD.
+SSRT = mean_go_RT - mean_SSD. This method is based upon the assumption that the race between the go and stop process is tied, which should be the case when the common 1-up-1-down tracking method (Levitt, 1971) is used. 
 
 Addionally, fitting 
 
