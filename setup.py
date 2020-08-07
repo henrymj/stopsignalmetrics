@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="stopsignalmetrics",
-    version="0.0.0.5",
+    version="0.0.0.7.0",
     author="Henry Jones",
     author_email="henrymj@stanford.edu",
     description="package for stop signal task metrics",

@@ -51,7 +51,7 @@ class StopSummary(MultiLevelComputer):
     def _fit_group(self, data_df):
         """Calculate all available metrics for a group."""
         self._raw_data = data_df.copy()
-        summary_helper = Summary(**self.args)
+        summary_helper = StopSummary(**self.args)
         metrics = self._raw_data.groupby('ID').apply(
             summary_helper.fit_transform).apply(pd.Series)
         if self._SSRTmodel.model == 'all':

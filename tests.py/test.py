@@ -3,26 +3,35 @@ tests for original code to perform in context of refactor
 
 """
 
-from ssrtcomputer.ssrtcomputer import SSRTComputer
+from stopsignalmetrics import StopData, SSRTmodel, PostStopSlow, Violations, StopSummary
 import numpy as np
 import pandas as pd
 import pytest
 
 
 @pytest.fixture(scope="session")
-def compy():
-    var_dict = {
-        'trialType_col': 'SS_trial_type',
-        'SSD_col': 'SS_delay',
-        'goRT_col': 'rt',
-        'stopRT_col': 'rt',
-        'go_key': 'go',
-        'stop_key': 'stop',
-        'block_col': 'current_block',
-        'response_col': 'key_press',
-        'corr_resp_col': 'correct_response',
+def stopdata_init():
+    variable_dict = {
+       "columns": {
+          "ID": "worker_id",
+          "block": "current_block",
+          "condition": "SS_trial_type",
+          "SSD": "SS_delay",
+          "goRT": "rt",
+          "stopRT": "rt",
+          "response": "key_press",
+          "correct_response": "correct_response",
+          "choice_accuracy": "choice_accuracy"
+       },
+       "key_codes": {
+          "go": "go",
+          "stop": "stop",
+          "correct": 1,
+          "incorrect": 0
+       }
     }
-    return(SSRTComputer(var_dict))
+    
+    return(StopData(var_dict=variable_dict))
 
 
 @pytest.fixture(scope="session")
@@ -33,8 +42,8 @@ def raw_example_data():
 
 
 @pytest.fixture(scope="session")
-def preprocessed_example_data(compy, raw_example_data):
-    return(compy.preprocess_data(raw_example_data))
+def preprocessed_example_data(stopdata, raw_example_data):
+    return(stopdata.fit_transform(raw_example_data))
 
 
 @pytest.fixture(scope="session")
@@ -45,18 +54,35 @@ def raw_group_data():
 
 
 @pytest.fixture(scope="session")
-def preprocessed_group_data(compy, raw_group_data):
-    return(compy.preprocess_data(raw_group_data))
+def preprocessed_group_data(stopdata, raw_group_data):
+    return(stopdata.fit_transform(raw_group_data))
 
 
 @pytest.fixture(scope="session")
-def ssrtc_group2():
+def stop_data_group2_init():
     # this was known as "group2" in the original notebook
-    return(SSRTComputer(SSD_col='StopSignalDelay',
-                        goRT_col='GoRT',
-                        stopRT_col='StopFailureRT',
-                        corr_resp_col='CorrectResponse',
-                        block_col='Block'))
+    variable_dict = {
+       "columns": {
+          "ID": "Subject",
+          "block": "Block",
+          "condition": "TrialType",
+          "SSD": "StopSignalDelay",
+          "goRT": "GoRT",
+          "stopRT": "StopFailureRT",
+          "response": "response",
+          "correct_response": "CorrectResponse",
+          "choice_accuracy": "choice_accuracy"
+       },
+       "key_codes": {
+          "go": "go",
+          "stop": "stop",
+          "correct": 1,
+          "incorrect": 0
+       }
+    }
+
+    StopData(var_dict=variable_dict)
+    return(StopData(var_dict=variable_dict))
 
 
 @pytest.fixture(scope="session")
@@ -99,8 +125,8 @@ def group2_raw_data(ssrtc_group2):
 
 
 @pytest.fixture(scope="session")
-def group2_preprocessed_data(ssrtc_group2, group2_raw_data):
-    return(ssrtc_group2.preprocess_data(group2_raw_data))
+def group2_preprocessed_data(stop_data2, group2_raw_data):
+    return(stop_data2.fit_transform(group2_raw_data))
 
 
 def test_class(compy):
@@ -119,22 +145,25 @@ def test_view_params(compy):
     compy.view_params()
 
 
-def test_ssrt_omission(compy, preprocessed_example_data):
+def test_ssrt_omission(preprocessed_example_data):
     assert np.allclose(282.6296296296296,
-                       compy.calc_SSRT(preprocessed_example_data,
-                                       method='omission'))
+                       SSRTmodel(model='omission').fit_transform(
+                           preprocessed_example_data)['SSRT']
+                      )
 
 
-def test_ssrt_integration(compy, preprocessed_example_data):
+def test_ssrt_integration(preprocessed_example_data):
     assert np.allclose(279.6296296296296,
-                       compy.calc_SSRT(preprocessed_example_data,
-                                       method='integration'))
+                       SSRTmodel(model='integration').fit_transform(
+                           preprocessed_example_data)['SSRT']
+                      )
 
 
 def test_ssrt_mean(compy, preprocessed_example_data):
     assert np.allclose(301.53228449688623,
-                       compy.calc_SSRT(preprocessed_example_data,
-                                       method='mean'))
+                       SSRTmodel(model='mean').fit_transform(
+                           preprocessed_example_data)['SSRT']
+                      )
 
 
 def test_load_group_data(raw_group_data):
@@ -146,7 +175,8 @@ def test_preprocess_group_data(preprocessed_group_data):
 
 
 def test_group_max_RT(compy, preprocessed_group_data):
-    assert np.allclose(1738.0, compy.calc_max_RT(preprocessed_group_data))
+    assert np.allclose(1738.0, SSRTmodel().fit_transform(
+                           preprocessed_example_data)['max_RT'])
 
 
 def test_keyword_init(ssrtc_group2):
@@ -161,12 +191,10 @@ def test_group2_preprocessed_data(group2_preprocessed_data):
     assert group2_preprocessed_data is not None
 
 
-def test_group2_summary(ssrtc_group2, group2_preprocessed_data):
-    summary_df2 = ssrtc_group2.summarize(
+def test_group2_summary(group2_preprocessed_data):
+    summary_df2 = StopSummary().fit_transform(
         group2_preprocessed_data,
-        subj_col='Subject',
-        SSRT_methods=['replacement', 'omission', 'integration', 'mean'],
-        include_acc=True)
+        level='group')
     # spot checks - use data for subject 10
     subject_index = 10
     reference_values = {
@@ -189,9 +217,10 @@ def test_group2_summary(ssrtc_group2, group2_preprocessed_data):
                            atol=1e-5)
 
 
-def test_calc_group_violations(ssrtc_group2, group2_preprocessed_data):
-    va_df = ssrtc_group2.calc_group_violations(
-        group2_preprocessed_data, subj_col='Subject')
+def test_calc_group_violations(group2_preprocessed_data):
+    va_df = Violations().fit_transform(
+        group2_preprocessed_data,
+        level='group')
     # spot check
     row_idx = 253
     reference_values = {
