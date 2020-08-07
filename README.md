@@ -8,10 +8,10 @@ __0. `StopData` - Preprocessing and Standardization.__
 This class will be initialized with a nested dictionary, mapping columns (e.g. the SSD and RT columns) and key_codes (e.g. labels for stop and go trials in the condition column) from the current data onto a standard. See stopsignalmetrics/standards.json or the examples to get a sense of this mapping. It will also compute choice accuracy if a choice accuracy column is not found, or `compute_acc_col=True` is passed in at intialization.
 
 __1. `SSRTmodel` - Stop Signal Reaction Time (SSRT) Computation.__
-The `SSRTmodel` class contains 4 methods of Stop Signal Reaction Time (SSRT) computation, following the recommendations of [Verbruggen et al. (2019)](10.7554/eLife.46323):
+The `SSRTmodel` class contains 4 methods of Stop Signal Reaction Time (SSRT) computation:
 
 _1. Integration with Replacement ("replacement")_  
-This method replaces go omissions with the max reaction time before getting the nth_RT.
+This method replaces go omissions with the max reaction time before getting the nth_RT. This is the recommended method from [Verbruggen et al. (2019)](10.7554/eLife.46323):
 
 _2. Integration with Omission Rate Adjustment ("omission")_  
 This method uses the omission rate to adjust the P(respond | signal) before getting the nth_index.
