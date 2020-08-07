@@ -1,6 +1,6 @@
 import json
 import pandas as pd
-from .base import MultiLevelComputer
+from .base import MultiLevelComputer, STANDARDS_FILE
 from .ssrtmodel import SSRTmodel
 from .sequence import PostStopSlow, Violations
 
@@ -30,7 +30,7 @@ class StopSummary(MultiLevelComputer):
             'violations_verbose': violations_verbose
         }
 
-        with open('standards.json') as json_file:
+        with open(STANDARDS_FILE) as json_file:
             standards = json.load(json_file)
         self._cols = standards['columns']
         self._codes = standards['key_codes']

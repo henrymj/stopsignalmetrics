@@ -12,7 +12,7 @@ class Computer:
     def __init__(self):
         self._raw_data = None
         self._transformed_data = None
-        with open('standards.json') as json_file:
+        with open(STANDARDS_FILE) as json_file:
             standards = json.load(json_file)
         self._cols = standards['columns']
         self._codes = standards['key_codes']
