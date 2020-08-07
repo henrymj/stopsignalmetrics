@@ -1,6 +1,10 @@
 import pandas as pd
 import json
 from sklearn.exceptions import NotFittedError
+import pkg_resources
+
+STANDARDS_FILE = pkg_resources.resource_filename(
+    'stopsignalmetrics', 'data/standards.json')
 
 
 class Computer:

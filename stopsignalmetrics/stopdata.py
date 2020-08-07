@@ -1,7 +1,7 @@
 import json
 import numpy as np
 import pandas as pd
-from .base import Computer
+from .base import Computer, STANDARDS_FILE
 
 
 class StopData(Computer):
@@ -25,7 +25,7 @@ class StopData(Computer):
         """Save passed in variables for mapping to standard."""
         # add variable dictionaries, supplementing anything missing
         # with the standards defined in the json
-        with open('standards.json') as json_file:
+        with open(STANDARDS_FILE) as json_file:
             stndrds = json.load(json_file)
         if var_dict is None:
             var_dict = stndrds
