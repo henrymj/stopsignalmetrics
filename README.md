@@ -31,7 +31,7 @@ _1. `Sequence`_
 This class will produces dataframes with triples of trials centered on trials based on an array-like list of indices or a query string. It is the backbone of the following methods.
 
 _2. `Post Stop Slowing`_  
-This class examines the change in go reaction times after a stop trial. By default it will use all stop trials, but users can specify focusing on stop-success or stop-failure trials.
+This class examines the change in go reaction times after a stop trial (i.e., RT on the trial immediately preceding a stop trial and subtracting it from RT on the trial immediately following a stop trial) . By default it will use all stop trials, but users can specify focusing on stop-success or stop-failure trials.
 
 _3. `Violations`_  
 This class compares stop-failure RTs to the preceding trial's correct go RTs, calculating a "mean violation" per SSD, with some thresholding to reduce noise.
