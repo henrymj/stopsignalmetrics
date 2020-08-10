@@ -1,6 +1,8 @@
 # stopsignalmetrics
 
 ![Python package](https://github.com/henrymj/stopsignalmetrics/workflows/Python%20package/badge.svg)
+[![codecov](https://codecov.io/gh/henrymj/stopsignalmetrics/branch/master/graph/badge.svg)](https://codecov.io/gh/henrymj/stopsignalmetrics)
+
 
 This is a package to streamline common computations on behavioral data from experiments using Stop Signal tasks. It is made up of multiple classes which focus on different types of metrics. All classes follow the scikit-learn `fit`, `transform` schema.
 
