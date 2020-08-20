@@ -178,7 +178,9 @@ class Violations(MultiLevelComputer):
                                         'mean_precedingGoRT'])
         va_df = info_df.query('n_go_stopfail_pairs >= {}'.format(
             self._n_pair_thresh))
-        self._transformed_data = va_df.sort_values(by=self._cols["SSD"])
+        self._transformed_data = va_df.sort_values(
+            by=self._cols["SSD"]
+            ).set_index('SSD')
 
     def _fit_group(self, data_df):
         """Find the mean violation at each SSD for each individual."""
@@ -188,7 +190,6 @@ class Violations(MultiLevelComputer):
         group_va_df = self._raw_data.groupby('ID').apply(
             violation.fit_transform)
         group_va_df = group_va_df.reset_index()
-        del group_va_df['level_1']
         all_ssdvals = group_va_df['SSD'].unique()
         all_ssdvals.sort()
         for ssd in all_ssdvals:
