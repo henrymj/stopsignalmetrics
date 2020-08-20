@@ -40,8 +40,8 @@ This class examines the change in go reaction times after a stop trial (i.e., RT
 - __`Violations`__  
 This class compares stop-failure RTs to the preceding trial's correct go RTs, calculating a "mean violation" per SSD, with some thresholding to reduce noise.
 
-#### __3. `Summary` - Describing a Stop Dataset.__  
-The `Summary` class computes every metric currently available, including a mean post-stop-slowing for each stop type ('all', 'success', 'fail'). It also attempts to compute a mean violation, thresholding at SSDs < 200ms.
+#### __3. `StopSummary` - Describing a Stop Dataset.__  
+The `StopSummary` class computes every metric currently available, including a mean post-stop-slowing for each stop type ('all', 'success', 'fail'). It also attempts to compute a mean violation, thresholding at SSDs < 200ms.
 
 #### __Notes__  
 
