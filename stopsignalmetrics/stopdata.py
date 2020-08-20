@@ -1,7 +1,7 @@
 import json
 import numpy as np
 import pandas as pd
-from .base import Computer, STANDARDS_FILE
+from .base import Computer
 
 
 class StopData(Computer):
@@ -25,22 +25,21 @@ class StopData(Computer):
         """Save passed in variables for mapping to standard."""
         # add variable dictionaries, supplementing anything missing
         # with the standards defined in the json
-        with open(STANDARDS_FILE) as json_file:
-            stndrds = json.load(json_file)
+        standards = self._load_standards()
         if var_dict is None:
-            var_dict = stndrds
+            var_dict = standards
         else:
-            for level in stndrds.keys():
+            for level in standards.keys():
                 if level not in var_dict.keys():
-                    var_dict[level] = stndrds[level].copy()
+                    var_dict[level] = standards[level].copy()
                 else:
-                    for key in stndrds[level].keys():
+                    for key in standards[level].keys():
                         if key not in var_dict[level].keys():
-                            var_dict[level][key] = stndrds[level][key]
+                            var_dict[level][key] = standards[level][key]
         self._map_cols = var_dict['columns']
         self._map_codes = var_dict['key_codes']
         self._variable_dict = var_dict
-        self._standards = stndrds
+        self._standards = standards
 
     def _check_variables_in_raw_data(self):
         """Make sure a mapping is possible."""
@@ -121,10 +120,11 @@ class StopData(Computer):
                                   ['key_codes'][code] for code
                                   in self._map_codes.keys()}
         for col in [self._standards['columns']['condition'],
-                    self._standards['columns']['choice_accuracy']]:
+                    self._standards['columns']['choice_accuracy'],
+                    self._standards['columns']['goRT'],
+                    self._standards['columns']['stopRT']]:
             data_df[col] = data_df[col].map(
-                standardize_codes_dict
-                ).fillna(data_df[col])
+                lambda x: standardize_codes_dict.get(x,x))
 
         assert self._is_preprocessed(data_df)
         self._transformed_data = data_df

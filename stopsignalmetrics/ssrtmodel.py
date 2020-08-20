@@ -101,7 +101,7 @@ class SSRTmodel(MultiLevelComputer):
         stop_idx = self._raw_data['condition'] == 'stop'
         num_stop_trials = self._raw_data.loc[stop_idx, 'stopRT'].count()
         num_stop_failures = self._raw_data.loc[stop_idx &
-                                               (self._raw_data['stopRT'] > 0),
+                                               (self._raw_data['stopRT'].notnull()),
                                                'stopRT'].count()
         p_respond = num_stop_failures / num_stop_trials
         self._metrics['p_respond'] = p_respond
@@ -116,19 +116,19 @@ class SSRTmodel(MultiLevelComputer):
         self._metrics['mean_go_RT'] = np.mean(goRTs)
         self._metrics['mean_stopfail_RT'] = self._raw_data.loc[
             (self._raw_data['condition'] == 'stop') &
-            (self._raw_data['stopRT'] > 0),
+            (self._raw_data['stopRT'].notnull()),
             'stopRT'].mean()
 
     def _calc_accs(self):
         """Calculate go and stop-failure Choice Accuracies."""
         self._metrics['go_acc'] = self._raw_data.loc[
             (self._raw_data['condition'] == 'go') &
-            (self._raw_data['goRT'] > 0),
+            (self._raw_data['goRT'].notnull()),
             'choice_accuracy'].mean()
 
         self._metrics['stopfail_acc'] = self._raw_data.loc[
             (self._raw_data['condition'] == 'stop') &
-            (self._raw_data['stopRT'] > 0),
+            (self._raw_data['stopRT'].notnull()),
             'choice_accuracy'].mean()
 
     def _calc_omission_nums(self):
@@ -137,7 +137,7 @@ class SSRTmodel(MultiLevelComputer):
             self._raw_data['condition'] == 'go', 'condition'].count()
         num_go_responses = self._raw_data.loc[
             (self._raw_data['condition'] == 'go') &
-            (self._raw_data['goRT'] > 0),
+            (self._raw_data['goRT'].notnull()),
             'condition'].count()
 
         omission_count = num_go_trials - num_go_responses
@@ -154,7 +154,7 @@ class SSRTmodel(MultiLevelComputer):
         """Get RTs, sorted ascendingly."""
 
         go_idx = ((self._raw_data['condition'] == 'go') &
-                  (self._raw_data['goRT'] > 0))
+                  (self._raw_data['goRT'].notnull()))
         goRTs = self._raw_data.loc[go_idx, 'goRT'].values
         if sort:
             goRTs.sort()

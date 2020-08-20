@@ -82,15 +82,15 @@ class PostStopSlow(Computer):
 
         keep_idx = ((sequence_df['pre_condition'] == "go") &
                     (sequence_df['post_condition'] == "go") &
-                    (sequence_df['pre_goRT'] > 0) &
-                    (sequence_df['post_goRT'] > 0))
+                    (sequence_df['pre_goRT'].notnull()) &
+                    (sequence_df['post_goRT'].notnull()))
 
         if self._correct_go_only:
             keep_idx = (keep_idx &
                         (sequence_df['pre_choice_accuracy'] == 1) &
                         (sequence_df['post_choice_accuracy'] == 1))
 
-        stop_fail_idx = sequence_df['curr_stopRT'] > 0
+        stop_fail_idx = sequence_df['curr_stopRT'].notnull()
         if stop_type == 'fail':
             keep_idx = (keep_idx &
                         stop_fail_idx)
@@ -151,11 +151,11 @@ class Violations(MultiLevelComputer):
         assert self._is_preprocessed(data_df)
         self._raw_data = data_df.copy()
         seq_df = Sequence().fit_transform(self._raw_data,
-                                          "condition=='stop' & stopRT>0")
+                                          "condition=='stop' & stopRT==stopRT")
 
         # filter to keep only previous Go trials, no omissions
         keep_idx = ((seq_df['pre_condition'] == 'go') &
-                    (seq_df['pre_goRT'] > 0))
+                    (seq_df['pre_goRT'].notnull()))
         seq_df = seq_df[keep_idx]
 
         # build up violation info per ssd

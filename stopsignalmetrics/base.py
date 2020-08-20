@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import json
 from sklearn.exceptions import NotFittedError
 import pkg_resources
@@ -12,8 +13,7 @@ class Computer:
     def __init__(self):
         self._raw_data = None
         self._transformed_data = None
-        with open(STANDARDS_FILE) as json_file:
-            standards = json.load(json_file)
+        standards = self._load_standards()
         self._cols = standards['columns']
         self._codes = standards['key_codes']
 
@@ -52,6 +52,19 @@ class Computer:
                 'missing {} from column: {}.'.format(
                 self._cols[acc], self._cols["choice_accuracy"])
         return True
+
+    def _load_standards(self):
+        with open(STANDARDS_FILE) as json_file:
+            standards = json.load(json_file)
+            self._replace_none(standards)
+            return standards
+
+    def _replace_none(self, any_dict):
+        for k, v in any_dict.items():
+            if v is None:
+                any_dict[k] = np.nan
+            elif type(v) == type(any_dict):
+                self._replace_none(v)
 
 
 class MultiLevelComputer(Computer):

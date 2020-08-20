@@ -14,6 +14,7 @@
        "go": "go",
        "stop": "stop",
        "correct": 1,
-       "incorrect": 0
+       "incorrect": 0,
+       "noResponse": null
     }
  }
