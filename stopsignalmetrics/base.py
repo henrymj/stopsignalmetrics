@@ -54,6 +54,7 @@ class Computer:
                 '{} present in {} column.'. format(
                     acc_code, self._cols["choice_accuracy"]
                 )
+
         return True
 
     def _load_standards(self):

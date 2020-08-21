@@ -60,10 +60,15 @@ class StopData(Computer):
         if self._map_cols['choice_accuracy'] in self._raw_data.columns:
             acc_codes = self._raw_data[
                 self._map_cols['choice_accuracy']].unique()
-            for acc in ['correct', 'incorrect']:
-                assert self._map_codes[acc] in acc_codes,\
-                    ('missing {} from column: '.format(self._map_codes[acc]),
-                     self._map_cols["choice_accuracy"])
+            acc_codes = np.asarray(acc_codes)[~np.isnan(acc_codes)]
+            original_acc_codes = [self._map_codes['correct'],
+                                  self._map_codes['incorrect']]
+            for acc_code in acc_codes:
+                assert acc_code in original_acc_codes,\
+                    '{} present in {} column.'. format(
+                        acc_code, self._cols["choice_accuracy"]
+                    )
+
         return True
 
     def _map_raw_data_to_standard(self):
