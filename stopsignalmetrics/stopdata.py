@@ -101,7 +101,7 @@ class StopData(Computer):
         if self._map_cols['block'] not in data_df.columns:
             data_df[self._map_cols['block']] = 1
 
-        # recompute choice accuracy
+        # recompute choice accuracy if missing / flagged
         if (self._map_cols['choice_accuracy'] not in self._raw_data.columns) |\
                 self._compute_acc_col:
             corr_code = self._map_codes['correct']
