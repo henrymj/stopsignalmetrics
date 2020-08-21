@@ -116,15 +116,25 @@ class StopData(Computer):
         rename_column_dict = {self._map_cols[col]: self._standards['columns']
                               [col] for col in self._map_cols.keys()}
         data_df = data_df.rename(columns=rename_column_dict)
-        standardize_codes_dict = {self._map_codes[code]: self._standards
-                                  ['key_codes'][code] for code
-                                  in self._map_codes.keys()}
-        for col in [self._standards['columns']['condition'],
-                    self._standards['columns']['choice_accuracy'],
-                    self._standards['columns']['goRT'],
-                    self._standards['columns']['stopRT']]:
-            data_df[col] = data_df[col].map(
-                lambda x: standardize_codes_dict.get(x,x))
+
+        # map key codes to various columns
+        condition_map = {
+            self._map_codes['go']: self._standards['key_codes']['go'],
+            self._map_codes['stop']: self._standards['key_codes']['stop'],
+        }
+        acc_map = {
+            self._map_codes['correct']: self._standards['key_codes']['correct'],
+            self._map_codes['incorrect']: self._standards['key_codes']['incorrect'],
+        }
+        no_response_map = {
+            self._map_codes['noResponse']: self._standards['key_codes']['noResponse']
+        }
+        cols_n_maps = [(self._standards['columns']['condition'], condition_map),
+                    (self._standards['columns']['choice_accuracy'], acc_map),
+                    (self._standards['columns']['goRT'], no_response_map),
+                    (self._standards['columns']['stopRT'], no_response_map)]
+        for col, map_dict in cols_n_maps:
+            data_df[col] = data_df[col].map(lambda x: map_dict.get(x,x))
 
         assert self._is_preprocessed(data_df)
         self._transformed_data = data_df

@@ -140,10 +140,10 @@ class Violations(MultiLevelComputer):
             assert self._transformed_data is not None
         except AssertionError:
             raise NotFittedError('Data must first be loaded using .fit()')
-        return(self._transformed_data.loc[
-            self._transformed_data[self._cols["SSD"]] <
-            self._mean_thresh,
-            'mean_violation']).mean()
+        return(self._transformed_data.query(
+            "SSD < {}".format(self._mean_thresh))[
+                'mean_violation'
+            ].mean())
 
     # private functions
     def _fit_individual(self, data_df):
