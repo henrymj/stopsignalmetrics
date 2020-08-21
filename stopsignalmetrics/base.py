@@ -47,10 +47,13 @@ class Computer:
                 self._cols[cond], self._cols["condition"])
 
         acc_codes = data_df[self._cols['choice_accuracy']].unique()
-        for acc in ['correct', 'incorrect']:
-            assert self._codes[acc] in acc_codes,\
-                'missing {} from column: {}.'.format(
-                self._cols[acc], self._cols["choice_accuracy"])
+        acc_codes = np.asarray(acc_codes)[~np.isnan(acc_codes)]
+        standard_acc_codes = [self._codes['correct'], self._codes['incorrect']]
+        for acc_code in acc_codes:
+            assert acc_code in standard_acc_codes,\
+                '{} present in {} column.'. format(
+                    acc_code, self._cols["choice_accuracy"]
+                )
         return True
 
     def _load_standards(self):
