@@ -99,10 +99,10 @@ class SSRTmodel(MultiLevelComputer):
         """Calculate the P(repsond|signal) of a dataset."""
 
         stop_idx = self._raw_data['condition'] == 'stop'
-        num_stop_trials = self._raw_data.loc[stop_idx, 'stopRT'].count()
+        num_stop_trials = self._raw_data.loc[stop_idx, 'stopRT'].shape[0]
         num_stop_failures = self._raw_data.loc[stop_idx &
                                                (self._raw_data['stopRT'].notnull()),
-                                               'stopRT'].count()
+                                               'stopRT'].shape[0]
         p_respond = num_stop_failures / num_stop_trials
         self._metrics['p_respond'] = p_respond
 
@@ -134,11 +134,11 @@ class SSRTmodel(MultiLevelComputer):
     def _calc_omission_nums(self):
         """Get omission_count and omission_rate, respectively."""
         num_go_trials = self._raw_data.loc[
-            self._raw_data['condition'] == 'go', 'condition'].count()
+            self._raw_data['condition'] == 'go', 'condition'].shape[0]
         num_go_responses = self._raw_data.loc[
             (self._raw_data['condition'] == 'go') &
             (self._raw_data['goRT'].notnull()),
-            'condition'].count()
+            'condition'].shape[0]
 
         omission_count = num_go_trials - num_go_responses
         omission_rate = omission_count/num_go_trials
