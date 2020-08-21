@@ -60,7 +60,7 @@ class StopData(Computer):
         if self._map_cols['choice_accuracy'] in self._raw_data.columns:
             acc_codes = self._raw_data[
                 self._map_cols['choice_accuracy']].unique()
-            acc_codes = np.asarray(acc_codes)[~np.isnan(acc_codes)]
+            acc_codes = [i for i in acc_codes if i==i]
             original_acc_codes = [self._map_codes['correct'],
                                   self._map_codes['incorrect']]
             for acc_code in acc_codes:

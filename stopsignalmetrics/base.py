@@ -47,7 +47,7 @@ class Computer:
                 self._cols[cond], self._cols["condition"])
 
         acc_codes = data_df[self._cols['choice_accuracy']].unique()
-        acc_codes = np.asarray(acc_codes)[~np.isnan(acc_codes)]
+        acc_codes = [i for i in acc_codes if i==i]
         standard_acc_codes = [self._codes['correct'], self._codes['incorrect']]
         for acc_code in acc_codes:
             assert acc_code in standard_acc_codes,\
