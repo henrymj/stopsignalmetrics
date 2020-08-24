@@ -19,9 +19,9 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     package_data={
-        'stopsignalmetrics': ['data/standards.json',
+        'stopsignalmetrics': ['data/*.json',
                               'data/*.csv',
-                              'data/*.xlsx']},
+                              ]},
     python_requires='>=3.4',
     install_requires=['numpy', 'pandas', 'scikit-learn']
 )

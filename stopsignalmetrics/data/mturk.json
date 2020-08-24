@@ -1,0 +1,20 @@
+{
+   "columns": {
+      "ID": "worker_id",
+      "block": "current_block",
+      "condition": "SS_trial_type",
+      "SSD": "SS_delay",
+      "goRT": "rt",
+      "stopRT": "rt",
+      "response": "key_press",
+      "correct_response": "correct_response",
+      "choice_accuracy": "choice_accuracy"
+   },
+   "key_codes": {
+      "go": "go",
+      "stop": "stop",
+      "correct": 1,
+      "incorrect": 0,
+      "noResponse": -1
+   }
+}

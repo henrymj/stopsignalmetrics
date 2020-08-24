@@ -7,13 +7,25 @@ import pkg_resources
 STANDARDS_FILE = pkg_resources.resource_filename(
     'stopsignalmetrics', 'data/standards.json')
 
+JSON_DICT = {}
+CSV_DICT = {}
+for source in ['mturk', 'inlab']:
+    CSV_DICT[source] = {}
+    JSON_DICT[source] = pkg_resources.resource_filename(
+                'stopsignalmetrics',
+                'data/{}.json'.format(source))
+    for level in ['group', 'individual']:
+        CSV_DICT[source][level] = pkg_resources.resource_filename(
+                'stopsignalmetrics',
+                'data/{}_{}.csv'.format(source, level))
+
 
 class Computer:
     """Parent class for computing metrics."""
     def __init__(self):
         self._raw_data = None
         self._transformed_data = None
-        standards = self._load_standards()
+        standards = self._load_json()
         self._cols = standards['columns']
         self._codes = standards['key_codes']
 
@@ -22,7 +34,7 @@ class Computer:
 
     def transform(self):
         try:
-            assert self.raw_data is not None
+            assert self._raw_data is not None
         except AssertionError:
             raise NotFittedError('Data must first be loaded using .fit()')
         return(self._transformed_data)
@@ -59,11 +71,11 @@ class Computer:
 
         return True
 
-    def _load_standards(self):
-        with open(STANDARDS_FILE) as json_file:
-            standards = json.load(json_file)
-            self._replace_none(standards)
-            return standards
+    def _load_json(self, filepath=STANDARDS_FILE):
+        with open(filepath) as json_file:
+            json_dict = json.load(json_file)
+            self._replace_none(json_dict)
+            return json_dict
 
     def _replace_none(self, any_dict):
         for k, v in any_dict.items():

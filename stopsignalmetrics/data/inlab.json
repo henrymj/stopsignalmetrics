@@ -1,0 +1,20 @@
+{
+   "columns": {
+      "ID": "Subject",
+      "block": "Block",
+      "condition": "TrialType",
+      "SSD": "StopSignalDelay",
+      "goRT": "GoRT",
+      "stopRT": "StopFailureRT",
+      "response": "response",
+      "correct_response": "CorrectChoiceResponse",
+      "choice_accuracy": "choice_accuracy"
+   },
+   "key_codes": {
+      "go": "go",
+      "stop": "stop",
+      "correct": 1,
+      "incorrect": 0,
+      "noResponse": 0
+   }
+}

@@ -1,13 +1,16 @@
 import json
 import numpy as np
 import pandas as pd
-from .base import Computer
+from .base import Computer, JSON_DICT, CSV_DICT
 
 
 class StopData(Computer):
     """Class for converitng a dataset to a standard for computation."""
 
     def __init__(self, var_dict=None, compute_acc_col=True):
+        self.reset(var_dict=var_dict, compute_acc_col=compute_acc_col)
+
+    def reset(self, var_dict=None, compute_acc_col=True):
         super().__init__()
         self._add_var_dict(var_dict)
         self._compute_acc_col = compute_acc_col
@@ -20,12 +23,22 @@ class StopData(Computer):
         self._map_raw_data_to_standard()
         return self
 
+    def load(self, source='', level='', return_clean=True):
+        raw_data, var_dict = self._read_data_and_var_dict(
+            source=source, level=level)
+        self.reset(var_dict=var_dict, compute_acc_col=self._compute_acc_col)
+        self.fit(raw_data)
+        if return_clean:
+            return self.transform()
+        else:
+            return self._raw_data, var_dict
+
     # private functions
     def _add_var_dict(self, var_dict=None):
         """Save passed in variables for mapping to standard."""
         # add variable dictionaries, supplementing anything missing
         # with the standards defined in the json
-        standards = self._load_standards()
+        standards = self._load_json()
         if var_dict is None:
             var_dict = standards
         else:
@@ -47,15 +60,12 @@ class StopData(Computer):
         # or mapped via the variable dict
         for key in [key for key in self._map_cols.keys()
                     if key not in ['block', 'choice_accuracy', 'ID']]:
-            print('column_key', key)
             assert self._map_cols[key] in self._raw_data.columns,\
                  'missing {} from raw data df columns'.format(
                     self._map_cols[key])
 
         condition_codes = self._raw_data[self._map_cols['condition']].unique()
-        print('condition_codes', condition_codes)
         for cond in ['go', 'stop']:
-            print('condition', cond)
             assert self._map_codes[cond] in condition_codes,\
                 ('missing {} from column: '.format(self._map_codes[cond]),
                  self._map_cols["condition"])
@@ -149,3 +159,10 @@ class StopData(Computer):
 
         assert self._is_preprocessed(data_df)
         self._transformed_data = data_df
+
+    def _read_data_and_var_dict(self, source='', level=''):
+        assert source in ['mturk', 'inlab']
+        assert level in ['group', 'individual']
+        var_dict = self._load_json(filepath=JSON_DICT[source])
+        data = pd.read_csv(CSV_DICT[source][level])
+        return data, var_dict
