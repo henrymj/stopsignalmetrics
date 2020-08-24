@@ -47,12 +47,15 @@ class StopData(Computer):
         # or mapped via the variable dict
         for key in [key for key in self._map_cols.keys()
                     if key not in ['block', 'choice_accuracy', 'ID']]:
+            print(key)
             assert self._map_cols[key] in self._raw_data.columns,\
                  'missing {} from raw data df columns'.format(
                     self._map_cols[key])
 
         condition_codes = self._raw_data[self._map_cols['condition']].unique()
+        print(condition_codes)
         for cond in ['go', 'stop']:
+            print(cond)
             assert self._map_codes[cond] in condition_codes,\
                 ('missing {} from column: '.format(self._map_codes[cond]),
                  self._map_cols["condition"])
@@ -60,10 +63,14 @@ class StopData(Computer):
         if self._map_cols['choice_accuracy'] in self._raw_data.columns:
             acc_codes = self._raw_data[
                 self._map_cols['choice_accuracy']].unique()
+            print(acc_codes)
             acc_codes = [i for i in acc_codes if i==i]
+            print(acc_codes)
             original_acc_codes = [self._map_codes['correct'],
                                   self._map_codes['incorrect']]
+            print(original_acc_codes)
             for acc_code in acc_codes:
+                print(acc_code
                 assert acc_code in original_acc_codes,\
                     '{} present in {} column.'. format(
                         acc_code, self._cols["choice_accuracy"]
