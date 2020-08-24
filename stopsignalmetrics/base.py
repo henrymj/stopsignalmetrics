@@ -46,6 +46,8 @@ class Computer:
                 'missing {} from column: {}.'.format(
                 self._cols[cond], self._cols["condition"])
 
+        # check that all unique non-nan values in the accuracy column 
+        # can be mapped onto the standard codes for correct or incorrect.
         acc_codes = data_df[self._cols['choice_accuracy']].unique()
         acc_codes = [i for i in acc_codes if i==i]
         standard_acc_codes = [self._codes['correct'], self._codes['incorrect']]

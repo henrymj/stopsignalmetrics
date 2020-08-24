@@ -60,18 +60,17 @@ class StopData(Computer):
                 ('missing {} from column: '.format(self._map_codes[cond]),
                  self._map_cols["condition"])
 
+        # check that all unique non-nan values in the accuracy column 
+        # can be mapped onto either correct or incorrect,
+        # as defined by the values in the var_dict.
         if self._map_cols['choice_accuracy'] in self._raw_data.columns:
-            acc_codes = self._raw_data[
+            raw_acc_codes = self._raw_data[
                 self._map_cols['choice_accuracy']].unique()
-            print('acc_codes', acc_codes)
-            acc_codes = [i for i in acc_codes if i==i]
-            print('nanfiltered_acc_codes', acc_codes)
-            original_acc_codes = [self._map_codes['correct'],
+            raw_acc_codes = [i for i in raw_acc_codes if i==i]
+            map_acc_codes = [self._map_codes['correct'],
                                   self._map_codes['incorrect']]
-            print('map_acc_codes', original_acc_codes)
-            for acc_code in acc_codes:
-                print('acc_code', acc_code)
-                assert acc_code in original_acc_codes,\
+            for acc_code in raw_acc_codes:
+                assert acc_code in map_acc_codes,\
                     '{} present in {} column.'. format(
                         acc_code, self._cols["choice_accuracy"]
                     )
