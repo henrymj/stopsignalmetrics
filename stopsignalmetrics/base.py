@@ -47,8 +47,11 @@ class Computer:
         """check that dataset matches standard."""
         assert isinstance(data_df, pd.core.frame.DataFrame),\
             'data must be in the form of a pandas dataframe.'
-
-        for key in [key for key in self._cols.keys() if key != 'ID']:
+        missable_columns = [
+            'ID', 'response', 'correct_response', 'choice_accuracy'
+            ]
+        for key in [key for key in self._cols.keys() if \
+            key not in missable_columns]:
             assert self._cols[key] in data_df.columns, \
                 'missing {} from data df columns'.format(self._cols[key])
 
@@ -60,14 +63,15 @@ class Computer:
 
         # check that all unique non-nan values in the accuracy column 
         # can be mapped onto the standard codes for correct or incorrect.
-        acc_codes = data_df[self._cols['choice_accuracy']].unique()
-        acc_codes = [i for i in acc_codes if i==i]
-        standard_acc_codes = [self._codes['correct'], self._codes['incorrect']]
-        for acc_code in acc_codes:
-            assert acc_code in standard_acc_codes,\
-                '{} present in {} column.'. format(
-                    acc_code, self._cols["choice_accuracy"]
-                )
+        if 'choice_accuracy' in data_df.columns:
+            acc_codes = data_df[self._cols['choice_accuracy']].unique()
+            acc_codes = [i for i in acc_codes if i==i]
+            standard_acc_codes = [self._codes['correct'], self._codes['incorrect']]
+            for acc_code in acc_codes:
+                assert acc_code in standard_acc_codes,\
+                    '{} present in {} column.'. format(
+                        acc_code, self._cols["choice_accuracy"]
+                    )
 
         return True
 

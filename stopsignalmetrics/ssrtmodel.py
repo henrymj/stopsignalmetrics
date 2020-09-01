@@ -40,10 +40,12 @@ class SSRTmodel(MultiLevelComputer):
             'stopfail_acc': np.nan,
         }
         self._calc_RTs()
-        self._calc_accs()
+
         self._calc_mean_SSD()
         self._calc_p_respond()
         self._calc_omission_nums()
+        if 'choice_accuracy' in self._raw_data.columns:
+            self._calc_accs()
         if np.isnan(self._metrics['max_RT']):
             _ = self._calc_max_RT()
         if self._metrics['p_respond'] > 0 and self._metrics['p_respond'] < 1:
@@ -61,7 +63,7 @@ class SSRTmodel(MultiLevelComputer):
 
         group_metrics = data_df.groupby('ID').apply(
             lambda x: SSRTmodel(model=self.model)
-            ._fit_individual(x, maxRT=groupmaxRT)
+            ._fit_individual(x, max_RT=groupmaxRT)
             .transform()).apply(pd.Series)
         if self.model == 'all':
             group_metrics = pd.concat([group_metrics['SSRT']
