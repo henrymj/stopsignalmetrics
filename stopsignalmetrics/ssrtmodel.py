@@ -5,7 +5,7 @@ from .base import MultiLevelComputer
 
 
 class SSRTmodel(MultiLevelComputer):
-    def __init__(self, model='mean'):
+    def __init__(self, model='replacement'):
         assert model in ['replacement', 'omission',
                          'integration', 'mean', 'all']
         super().__init__()
@@ -33,7 +33,9 @@ class SSRTmodel(MultiLevelComputer):
             'p_respond': np.nan,
             'max_RT': max_RT,
             'mean_go_RT': np.nan,
+            'sd_go_RT': np.nan,
             'mean_stopfail_RT': np.nan,
+            'sd_stopfail_RT': np.nan,
             'omission_count': np.nan,
             'omission_rate': np.nan,
             'go_acc': np.nan,
@@ -115,11 +117,16 @@ class SSRTmodel(MultiLevelComputer):
     def _calc_RTs(self):
         """Find mean go and stop-fail RTs."""
         goRTs = self._get_all_goRTs()
-        self._metrics['mean_go_RT'] = np.mean(goRTs)
-        self._metrics['mean_stopfail_RT'] = self._raw_data.loc[
+        if len(goRTs) > 0:
+            self._metrics['mean_go_RT'] = np.mean(goRTs)
+            self._metrics['sd_go_RT'] = np.std(goRTs)
+        stopfailRTs = self._raw_data.loc[
             (self._raw_data['condition'] == 'stop') &
             (self._raw_data['stopRT'].notnull()),
-            'stopRT'].mean()
+            'stopRT']
+        if len(stopfailRTs) > 0:
+            self._metrics['mean_stopfail_RT'] = stopfailRTs.mean()
+            self._metrics['sd_stopfail_RT'] = stopfailRTs.std()
 
     def _calc_accs(self):
         """Calculate go and stop-failure Choice Accuracies."""
