@@ -10,14 +10,15 @@ STANDARDS_FILE = pkg_resources.resource_filename(
 JSON_DICT = {}
 CSV_DICT = {}
 for source in ['mturk', 'inlab']:
-    CSV_DICT[source] = {}
     JSON_DICT[source] = pkg_resources.resource_filename(
                 'stopsignalmetrics',
                 'data/{}.json'.format(source))
-    for level in ['group', 'individual']:
-        CSV_DICT[source][level] = pkg_resources.resource_filename(
-                'stopsignalmetrics',
-                'data/{}_{}.csv'.format(source, level))
+    CSV_DICT[source] = {
+        level: pkg_resources.resource_filename(
+            'stopsignalmetrics', 'data/{}_{}.csv'.format(source, level)
+        )
+        for level in ['group', 'individual']
+    }
 
 
 class Computer:
@@ -55,11 +56,11 @@ class Computer:
             assert self._cols[key] in data_df.columns, \
                 'missing {} from data df columns'.format(self._cols[key])
 
-        condition_codes = data_df[self._cols['condition']].unique()
-        for cond in ['go', 'stop']:
-            assert self._codes[cond] in condition_codes,\
-                'missing {} from column: {}.'.format(
-                self._cols[cond], self._cols["condition"])
+        # condition_codes = data_df[self._cols['condition']].unique()
+        # for cond in ['go', 'stop']:
+        #     assert self._codes[cond] in condition_codes,\
+        #         'missing {} from column: {}.'.format(
+        #         self._cols[cond], self._cols["condition"])
 
         # check that all unique non-nan values in the accuracy column 
         # can be mapped onto the standard codes for correct or incorrect.
@@ -77,16 +78,14 @@ class Computer:
 
     def _load_json(self, filepath=STANDARDS_FILE):
         with open(filepath) as json_file:
-            json_dict = json.load(json_file)
-            self._replace_none(json_dict)
-            return json_dict
+            return json.load(json_file)
 
-    def _replace_none(self, any_dict):
-        for k, v in any_dict.items():
-            if v is None:
-                any_dict[k] = np.nan
-            elif type(v) == type(any_dict):
-                self._replace_none(v)
+    # def _replace_none(self, any_dict):
+    #     for k, v in any_dict.items():
+    #         if v is None:
+    #             any_dict[k] = None
+    #         elif type(v) == type(any_dict):
+    #             self._replace_none(v)
 
 
 class MultiLevelComputer(Computer):
@@ -94,22 +93,22 @@ class MultiLevelComputer(Computer):
     def __init__(self):
         super().__init__()
 
-    def fit(self, data_df, level='individual'):
+    def fit(self, data_df, level='individual', **kwargs):
         assert level in ['individual', 'group']
         self._level = level
         fit_dict = {
             'individual': self._fit_individual,
             'group': self._fit_group
         }
-        fit_dict[self._level](data_df)
+        fit_dict[self._level](data_df, **kwargs)
         return self
 
-    def fit_transform(self, data_df, level='individual'):
-        self.fit(data_df, level=level)
+    def fit_transform(self, data_df, level='individual', **kwargs):
+        self.fit(data_df, level=level, **kwargs)
         return self._transformed_data
 
-    def _fit_individual(self, data_df):
+    def _fit_individual(self, data_df, **kwargs):
         return self._is_preproccessed(data_df)
 
-    def _fit_group(self, data_df):
+    def _fit_group(self, data_df, **kwargs):
         return self._is_preproccessed(data_df)
