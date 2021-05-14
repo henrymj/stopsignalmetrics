@@ -96,27 +96,27 @@ class StopData(Computer):
             data_df[self._standards['columns']['goRT']] = np.where(
                 data_df[self._map_cols['condition']] == self._map_codes['go'],
                 data_df[self._map_cols['goRT']],
-                np.nan)
+                None)
             data_df[self._standards['columns']['stopRT']] = np.where(
                 data_df[self._map_cols['condition']] ==
                 self._map_codes['stop'],
                 data_df[self._map_cols['stopRT']],
-                np.nan)
+                None)
             del data_df[self._map_cols['goRT']]
         else:
             data_df.loc[
                 data_df[self._map_cols['condition']] !=
                 self._map_codes['go'],
-                self._map_cols['goRT']] = np.nan
+                self._map_cols['goRT']] = None
             data_df.loc[
                 data_df[self._map_cols['condition']] !=
                 self._map_codes['stop'],
-                self._map_cols['stopRT']] = np.nan
+                self._map_cols['stopRT']] = None
 
         # drop SSDs of non-stop Trials
         data_df.loc[
             data_df[self._map_cols['condition']] != self._map_codes['stop'],
-            self._map_cols['SSD']] = np.nan
+            self._map_cols['SSD']] = None
 
         # add block column if not present
         if self._map_cols['block'] not in data_df.columns:
