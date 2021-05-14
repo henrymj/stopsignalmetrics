@@ -91,15 +91,15 @@
 #     eg_group2_file = 'examples/example_data/DataFixedSSDs2.xlsx'
 #     group2_df = pd.read_excel(eg_group2_file)
 #     group2_df = group2_df.replace(
-#         r'^\s*$', np.nan, regex=True
-#         ).replace('?', np.nan)
+#         r'^\s*$', None, regex=True
+#         ).replace('?', None)
 
 #     # build up "correct" responses for stop trials
 #     addon_file = 'examples/example_data/' +\
 #         'FixedSSD2StopTrialChoiceAccuracyInput.xlsx'
 #     addon_df = pd.read_excel(addon_file)
 
-#     group2_df['StopTrialCorrectResponse'] = np.nan
+#     group2_df['StopTrialCorrectResponse'] = None
 
 #     # circle response
 #     for shape in ['Circle', 'Rhombus', 'Square', 'Triangle']:
