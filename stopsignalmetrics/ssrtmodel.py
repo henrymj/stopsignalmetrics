@@ -22,24 +22,24 @@ class SSRTmodel(MultiLevelComputer):
         # compute QA metrics
         self._qa = pd.DataFrame()
 
-    def _fit_individual(self, data_df, max_RT=np.nan):
+    def _fit_individual(self, data_df, max_RT=None):
         """Get SSRT and related metrics for an individual."""
         assert self._is_preprocessed(data_df)
         # fit the model for a single subject
         self._raw_data = data_df.copy()
         self._metrics = {
-            'SSRT': np.nan,
-            'mean_SSD': np.nan,
-            'p_respond': np.nan,
+            'SSRT': None,
+            'mean_SSD': None,
+            'p_respond': None,
             'max_RT': max_RT,
-            'mean_go_RT': np.nan,
-            'sd_go_RT': np.nan,
-            'mean_stopfail_RT': np.nan,
-            'sd_stopfail_RT': np.nan,
-            'omission_count': np.nan,
-            'omission_rate': np.nan,
-            'go_acc': np.nan,
-            'stopfail_acc': np.nan,
+            'mean_go_RT': None,
+            'sd_go_RT': None,
+            'mean_stopfail_RT': None,
+            'sd_stopfail_RT': None,
+            'omission_count': None,
+            'omission_rate': None,
+            'go_acc': None,
+            'stopfail_acc': None,
         }
         self._calc_RTs()
 
@@ -48,9 +48,9 @@ class SSRTmodel(MultiLevelComputer):
         self._calc_omission_nums()
         if 'choice_accuracy' in self._raw_data.columns:
             self._calc_accs()
-        if np.isnan(self._metrics['max_RT']):
+        if self._metrics['max_RT'] is None:
             _ = self._calc_max_RT()
-        if self._metrics['p_respond'] > 0 and self._metrics['p_respond'] < 1:
+        if (self._metrics['p_respond'] is not None) and (self._metrics['p_respond'] > 0 and self._metrics['p_respond'] < 1) :
             self._calc_SSRT()
         self._transformed_data = self._metrics.copy()
         return self
@@ -77,38 +77,49 @@ class SSRTmodel(MultiLevelComputer):
     # private functions
     def _calc_SSRT(self):
         """ Calculate the SSRT via 4 supported methods."""
-        out_dict = {}
         goRTs = self._get_all_goRTs(sort=True)
         P_respond = self._metrics['p_respond']
-        corrected_P_respond = P_respond/(1-self._metrics['omission_rate'])
-        goRTs_w_replacements = np.concatenate((
-            goRTs,
-            [self._metrics['max_RT']] * self._metrics['omission_count']))
 
-        for key, nrt in [('mean', np.mean(goRTs)),
-                         ('integration', self._get_nth_RT(P_respond, goRTs)),
-                         ('omission', self._get_nth_RT(corrected_P_respond,
-                                                       goRTs)),
-                         ('replacement', self._get_nth_RT(P_respond,
-                                                          goRTs_w_replacements
-                                                          ))]:
-            out_dict[key] = nrt - self._metrics['mean_SSD']
+        nrt_dict = {
+            'mean': lambda : np.mean(goRTs),
+            'integration': lambda : self._get_nth_RT(P_respond,
+                                                     goRTs
+                                                     ),
+            'omission': lambda : self._get_nth_RT(P_respond/(1-self._metrics['omission_rate']), # corrected P(resp)
+                                                  goRTs
+                                                  ),
+            'replacement': lambda : self._get_nth_RT(P_respond,     
+                                                     np.concatenate((
+            goRTs,
+            [self._metrics['max_RT']] * self._metrics['omission_count'])) # appending max_RT to replace omissions
+                                                     ),
+        }
+        # out_dict = {
+        #     key: nrt - self._metrics['mean_SSD']
+        #     for key, nrt in [
+        #         ('mean', np.mean(goRTs)),
+        #         ('integration', self._get_nth_RT(P_respond, goRTs)),
+        #         ('omission', self._get_nth_RT(corrected_P_respond, goRTs)),
+        #         ('replacement', self._get_nth_RT(P_respond, goRTs_w_replacements)),
+        #     ]
+        # }
 
         if self.model == 'all':
-            self._metrics['SSRT'] = out_dict
+            self._metrics['SSRT'] = {k: func() - self._metrics['mean_SSD'] for k, func in nrt_dict.items()}
         else:
-            self._metrics['SSRT'] = out_dict[self.model]
+            self._metrics['SSRT'] = nrt_dict[self.model]() - self._metrics['mean_SSD']
 
     def _calc_p_respond(self):
         """Calculate the P(repsond|signal) of a dataset."""
 
         stop_idx = self._raw_data['condition'] == 'stop'
         num_stop_trials = self._raw_data.loc[stop_idx, 'stopRT'].shape[0]
-        num_stop_failures = self._raw_data.loc[stop_idx &
-                                               (self._raw_data['stopRT'].notnull()),
-                                               'stopRT'].shape[0]
-        p_respond = num_stop_failures / num_stop_trials
-        self._metrics['p_respond'] = p_respond
+        if num_stop_trials > 0:
+            num_stop_failures = self._raw_data.loc[stop_idx &
+                                                (self._raw_data['stopRT'].notnull()),
+                                                'stopRT'].shape[0]
+            p_respond = num_stop_failures / num_stop_trials
+            self._metrics['p_respond'] = p_respond
 
     def _calc_mean_SSD(self):
         """Calculate the mean SSD of a dataset."""
