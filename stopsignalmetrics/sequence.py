@@ -16,9 +16,6 @@ class Sequence(Computer):
             pd.core.indexes.numeric.IntegerIndex,
             pd.core.indexes.numeric.UInt64Index,
             pd.core.indexes.numeric.NumericIndex,
-            pd.core.indexes.numeric.ABCFloat64Index,
-            pd.core.indexes.numeric.ABCInt64Index,
-            pd.core.indexes.numeric.ABCUInt64Index,
             )
 
     def fit(self, data_df, indices):
@@ -56,22 +53,23 @@ class Sequence(Computer):
         return(self._transformed_data)
 
 
-class PostStopSlow(Computer):
+class PostStopSlow(MultiLevelComputer):
     def __init__(self, correct_go_only=True, filter_columns=True):
         super().__init__()
-        self._correct_go_only = correct_go_only,
+        self._correct_go_only = correct_go_only
         self._filter_columns = filter_columns
-
-    def fit(self, data_df, stop_type='all'):
+    
+    def _fit_individual(self, data_df, stop_type='all', query_suffix=None):
         """Compare go RTs before and after stop trials."""
         assert self._is_preprocessed(data_df)
         assert stop_type in ['all', 'success', 'fail'], \
             "Can only exmine 3 types of stop trials: 'all', 'success', 'fail'."
-        self._raw_data = data_df.copy()
+        self._raw_data = data_df.copy().reset_index(drop=True)
+        base_query = "condition=='stop'"
+        query = base_query + query_suffix if query_suffix is not None else base_query
         sequence_df = Sequence().fit_transform(
             self._raw_data,
-            "{}=='{}'".format(self._cols['condition'],
-                              self._codes['stop'])
+            query
             )
 
         if self._filter_columns:
@@ -104,9 +102,15 @@ class PostStopSlow(Computer):
         self._transformed_data = sequence_df.reset_index(drop=True)
         return self
 
-    def fit_transform(self, data_df, stop_type='all'):
-        self.fit(data_df, stop_type=stop_type)
-        return(self._transformed_data)
+    def _fit_group(self, data_df, **indiv_kwargs):
+        """Find the mean PSS for each individual."""
+        assert self._is_preprocessed(data_df)
+        pss = PostStopSlow(correct_go_only=self._correct_go_only,
+                           filter_columns=self._filter_columns)
+        self._raw_data = data_df.copy()
+        group_out_df = self._raw_data.groupby('ID').apply(
+            pss.fit_transform, **indiv_kwargs)
+        self._transformed_data = group_out_df
 
     def get_diff_list(self):
         """Get differences between goRTs before and after some stop trials."""
@@ -146,12 +150,14 @@ class Violations(MultiLevelComputer):
             ].mean())
 
     # private functions
-    def _fit_individual(self, data_df):
+    def _fit_individual(self, data_df, query_suffix=None):
         """Find the mean violation at each SSD for an individual."""
         assert self._is_preprocessed(data_df)
         self._raw_data = data_df.copy()
+        base_query = "condition=='stop' & stopRT==stopRT" # this looks for stop failures
+        query = base_query + query_suffix if query_suffix is not None else base_query
         seq_df = Sequence().fit_transform(self._raw_data,
-                                          "condition=='stop' & stopRT==stopRT")
+                                          query)
 
         # filter to keep only previous Go trials, no omissions
         keep_idx = ((seq_df['pre_condition'] == 'go') &
@@ -182,13 +188,15 @@ class Violations(MultiLevelComputer):
             by=self._cols["SSD"]
             ).set_index('SSD')
 
-    def _fit_group(self, data_df):
+    def _fit_group(self, data_df, **indiv_kwargs):
         """Find the mean violation at each SSD for each individual."""
         assert self._is_preprocessed(data_df)
+        violation = Violations(mean_thresh=self._mean_thresh,
+                               n_pair_thresh=self._n_pair_thresh,
+                               verbose=self._verbose)
         self._raw_data = data_df.copy()
-        violation = Violations()
         group_va_df = self._raw_data.groupby('ID').apply(
-            violation.fit_transform)
+            violation.fit_transform, **indiv_kwargs)
         group_va_df = group_va_df.reset_index()
         all_ssdvals = group_va_df['SSD'].unique()
         all_ssdvals.sort()
