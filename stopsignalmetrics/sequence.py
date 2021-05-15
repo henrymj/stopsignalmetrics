@@ -97,6 +97,11 @@ class PostStopSlow(MultiLevelComputer):
                         ~np.array(stop_fail_idx))
 
         sequence_df = sequence_df[keep_idx]
+        if len(sequence_df)==0:
+            seq_T = sequence_df.T
+            seq_T[0] = None
+            sequence_df = seq_T.T
+
         self._diff_list = (sequence_df['post_goRT'] - sequence_df['pre_goRT'])
         self._mean_pss = self._diff_list.mean()
         self._transformed_data = sequence_df.reset_index(drop=True)
